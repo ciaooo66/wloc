@@ -31,8 +31,8 @@ https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.stove
 
 直接用快捷指令切换 / 清除定位，无需打开选点页面：
 
-- **wloc 设置地理位置**：https://www.icloud.com/shortcuts/a57f1d9b915542f19cd9c31572cbe9ff
-- **wloc 清理恢复位置**：https://www.icloud.com/shortcuts/8bb3231a974b4a0c8def89a556be001c
+- **wloc 设置地理位置**：https://www.icloud.com/shortcuts/a82717d8fdad4e6280866fcf911173f7
+- **wloc 清理恢复位置**：https://www.icloud.com/shortcuts/f42632d406504f24a2cd163af4fe012f
 
 **用法**
 
