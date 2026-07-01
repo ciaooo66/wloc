@@ -3,7 +3,9 @@
 #!homepage=https://github.com/ciaooo66/wloc
 #!icon=https://raw.githubusercontent.com/ciaooo66/wloc/refs/heads/main/wloc.jpg
 #!category=Tools
-
+[Rule]
+DOMAIN,gs-loc.apple.com,DIRECT
+DOMAIN,gs-loc-cn.apple.com,DIRECT
 [Script]
 Apple WLOC = type=http-response,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/clls\/wloc,requires-body=1,binary-body-mode=1,max-size=0,timeout=30,script-path=https://raw.githubusercontent.com/ciaooo66/wloc/refs/heads/main/dist/wloc.js,argument=longitude=113.94114&latitude=22.544577&accuracy=25&logLevel=info
 WLOC Settings = type=http-request,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/wloc-settings\/save,requires-body=0,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/ciaooo66/wloc/refs/heads/main/dist/wloc-settings.js
