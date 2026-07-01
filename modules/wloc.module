@@ -1,5 +1,5 @@
-#!name=Apple WLOC 定位修改
-#!desc=修改 Apple 网络定位返回坐标 (Shadowrocket 小火箭) | 快捷指令(推荐): 设置地理位置 https://www.icloud.com/shortcuts/25c4b48dae044648a6bc13248d5cc86c 清理恢复位置 https://www.icloud.com/shortcuts/e8810b79f6a6405dacda4046b7534b57 
+#!name=虚拟定位模块
+#!desc=Shadowrocket 小火箭 | 快捷指令(推荐): 设置地理位置 https://www.icloud.com/shortcuts/25c4b48dae044648a6bc13248d5cc86c 清理恢复位置 https://www.icloud.com/shortcuts/e8810b79f6a6405dacda4046b7534b57 
 #!homepage=https://github.com/ciaooo66/wloc
 #!icon=https://raw.githubusercontent.com/ciaooo66/wloc/refs/heads/main/wloc.jpg
 #!category=Tools
