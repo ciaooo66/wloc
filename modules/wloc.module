@@ -1,5 +1,5 @@
 #!name=虚拟定位模块
-#!desc=Shadowrocket 小火箭 | 支持网页/快捷指令写入校验，未命中模块时不误报成功
+#!desc=Shadowrocket 小火箭 | 支持网页/快捷指令写入校验，未命中模块时不误报成功 快捷指令：修改定位：https://www.icloud.com/shortcuts/f5aa9c61bb4e4810a2c2f897680fcb0f 恢复定位：https://www.icloud.com/shortcuts/798f69f9e1344dc9b0f44f36a7e29968
 #!author=ciaooo66
 #!homepage=https://github.com/ciaooo66/wloc
 #!icon=https://raw.githubusercontent.com/ciaooo66/wloc/refs/heads/main/wloc.jpg
