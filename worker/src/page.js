@@ -79,14 +79,16 @@ body { font-family:-apple-system,system-ui,"SF Pro","Helvetica Neue",sans-serif;
 </div>
 </div>
 <div class="panel">
-  <div class="error-banner" id="errorBanner">
-    <b>模块未生效</b>
-    请检查以下配置：<br>
-    1. 已安装并启用 WLOC 定位模块<br>
-    2. MITM 已开启且信任证书<br>
-    3. MITM 主机名包含 gs-loc.apple.com<br>
-    4. 当前网络已走代理
-  </div>
+    <div class="error-banner" id="errorBanner">
+      <b>储存失败：WLOC 模块未生效</b>
+      请检查以下配置：<br>
+      1. 小火箭 / 圈 X 是否已开启，顶部是否有 VPN 图标<br>
+      2. WLOC 模块或重写是否已启用<br>
+      3. HTTPS 解密 / MITM 是否已开启<br>
+      4. 证书是否已安装并完全信任<br>
+      5. MITM 主机名是否包含 gs-loc.apple.com 和 gs-loc-cn.apple.com<br>
+      6. 当前网页请求是否走代理工具
+    </div>
   <div class="card">
     <h3>选择目标位置</h3>
     <div class="coords" id="coords">点击地图或使用下方工具选择位置</div>
