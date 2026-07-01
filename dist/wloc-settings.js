@@ -1,19 +1,28 @@
 /*
  * wloc-settings.js
- * Save / query / clear WLOC target location.
- * Hit-check version: returns WLOC_SETTINGS_HIT + nonce.
+ * 保存 / 查询 / 清除 WLOC 目标坐标
  *
- * Supports:
- * - Shadowrocket / Surge / Loon / Stash: $persistentStore
- * - Quantumult X: $prefs
+ * 目标：
+ * 1. 命中代理脚本时返回 WLOC_SETTINGS_HIT
+ * 2. 回显 nonce，方便网页 / 快捷指令判断这次请求真的被脚本处理了
+ * 3. 兼容 Shadowrocket / Surge / Loon / Stash 的 $persistentStore
+ * 4. 兼容 Quantumult X 的 $prefs
  */
 
 const STORE_KEY = 'wloc_settings';
 const HIT_FLAG = 'WLOC_SETTINGS_HIT';
 
+function hasPrefs() {
+  return typeof $prefs !== 'undefined';
+}
+
+function hasPersistentStore() {
+  return typeof $persistentStore !== 'undefined';
+}
+
 function runtimeName() {
-  if (typeof $prefs !== 'undefined') return 'Quantumult X';
-  if (typeof $persistentStore !== 'undefined') return 'PersistentStore';
+  if (hasPrefs()) return 'Quantumult X';
+  if (hasPersistentStore()) return 'PersistentStore';
   return 'Unknown';
 }
 
@@ -40,59 +49,49 @@ function parseQuery(url) {
       val = decodeURIComponent(rawVal.replace(/\+/g, ' '));
     } catch (_) {}
 
-    if (!(key in params)) params[key] = val;
+    if (!(key in params)) {
+      params[key] = val;
+    }
   }
 
   return params;
 }
 
 function storeRead(key) {
-  if (typeof $prefs !== 'undefined' && typeof $prefs.valueForKey === 'function') {
+  if (hasPrefs() && typeof $prefs.valueForKey === 'function') {
     return $prefs.valueForKey(key);
   }
 
-  if (typeof $persistentStore !== 'undefined' && typeof $persistentStore.read === 'function') {
+  if (hasPersistentStore() && typeof $persistentStore.read === 'function') {
     return $persistentStore.read(key);
   }
 
-  throw new Error('当前运行环境不支持持久化存储');
+  throw new Error('当前运行环境不支持持久化读取');
 }
 
 function storeWrite(key, value) {
-  if (typeof $prefs !== 'undefined') {
-    if (value === null) {
-      if (typeof $prefs.removeValueForKey === 'function') {
-        const ret = $prefs.removeValueForKey(key);
-        return ret !== false;
-      }
+  const str = value === null ? '' : JSON.stringify(value);
 
-      if (typeof $prefs.setValueForKey === 'function') {
-        const ret = $prefs.setValueForKey('', key);
-        return ret !== false;
-      }
-
-      return false;
-    }
-
-    if (typeof $prefs.setValueForKey === 'function') {
-      const ret = $prefs.setValueForKey(JSON.stringify(value), key);
-      return ret !== false;
-    }
-
-    return false;
-  }
-
-  if (typeof $persistentStore !== 'undefined' && typeof $persistentStore.write === 'function') {
-    if (value === null) {
-      const ret = $persistentStore.write(null, key);
-      return ret !== false;
-    }
-
-    const ret = $persistentStore.write(JSON.stringify(value), key);
+  if (hasPrefs() && typeof $prefs.setValueForKey === 'function') {
+    const ret = $prefs.setValueForKey(str, key);
     return ret !== false;
   }
 
-  throw new Error('当前运行环境不支持持久化存储');
+  if (hasPersistentStore() && typeof $persistentStore.write === 'function') {
+    const ret = $persistentStore.write(str, key);
+    return ret !== false;
+  }
+
+  throw new Error('当前运行环境不支持持久化写入');
+}
+
+function storeRemove(key) {
+  if (hasPrefs() && typeof $prefs.removeValueForKey === 'function') {
+    const ret = $prefs.removeValueForKey(key);
+    return ret !== false;
+  }
+
+  return storeWrite(key, null);
 }
 
 function readLocation() {
@@ -131,8 +130,6 @@ function responseJson(obj) {
     ...obj
   };
 
-  const body = JSON.stringify(payload);
-
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
@@ -142,14 +139,16 @@ function responseJson(obj) {
     'X-WLOC-HIT': '1'
   };
 
+  const body = JSON.stringify(payload);
+
   /*
-   * Quantumult X script-echo-response:
+   * Quantumult X script-echo-response：
    *   $done({ status, headers, body })
    *
-   * Shadowrocket / Surge / Loon / Stash:
+   * Shadowrocket / Surge / Loon / Stash：
    *   $done({ response: { status, headers, body } })
    */
-  if (typeof $prefs !== 'undefined' && typeof $persistentStore === 'undefined') {
+  if (hasPrefs() && !hasPersistentStore()) {
     $done({
       status: 'HTTP/1.1 200 OK',
       headers,
@@ -169,12 +168,19 @@ function responseJson(obj) {
 
 try {
   const url = $request && $request.url ? $request.url : '';
+  const method = $request && $request.method ? String($request.method).toUpperCase() : 'GET';
   const params = parseQuery(url);
 
   const action = params.action || 'save';
   const nonce = params.nonce || '';
 
-  if (action === 'query') {
+  if (method === 'OPTIONS') {
+    responseJson({
+      success: true,
+      action: 'options',
+      nonce
+    });
+  } else if (action === 'query') {
     const data = readLocation();
 
     if (data) {
@@ -195,9 +201,8 @@ try {
         error: '无已保存坐标'
       });
     }
-
   } else if (action === 'clear') {
-    const ok = storeWrite(STORE_KEY, null);
+    const ok = storeRemove(STORE_KEY);
 
     responseJson({
       success: !!ok,
@@ -205,7 +210,6 @@ try {
       nonce,
       error: ok ? undefined : '清除失败：持久化存储返回 false'
     });
-
   } else {
     const longitude = Number(params.lon || params.longitude);
     const latitude = Number(params.lat || params.latitude);
@@ -247,7 +251,6 @@ try {
       });
     }
   }
-
 } catch (e) {
   responseJson({
     success: false,
